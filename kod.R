@@ -1,28 +1,26 @@
 #załóżmy że mamy dwie funkcje celu
 #jedna ma 3 parametry a druga 2
-a1<-2
-b1<-1
-c1<-2
-b2<-3
-c2<-4
+x1<-2
+x2<-(-3.5)
+x3<-4.29
 #funkcje
-f1 <- function(x,a,b,c){
-  return(a*x^2+b*x+c)
+f1 <- function(x){
+  return(x)
 }
-f2 <- function(x,b,c){
-  return(b*x+c)
+f2 <- function(x1,x2,x3){
+  return (1 - (1/(4*pi**2))*(x1+pi)**2 + abs(x2 - 5*cos(x1))**(1/3) + abs(x3 - 5*sin(x1))**(1/3))
 }
 #dziedzina
 dx<-seq(0,10,1)
 #wartości dla prawdziwych parametrów
-y1<-f1(dx,a1,b1,c1)
-y2<-f2(dx,b2,c2)
+y1<-f1(x1)
+y2<-f2(x1,x2,x3)
 #funkcja licząca niedopasowanie dla pierwszej funkcji
 m1<-function(par){
   a<-par[1]
   b<-par[2]
   c<-par[3]
-  mis1<-sum ( sqrt( (y1-f1(dx,a,b,c))^2 ) )
+  mis1<-sum ( sqrt( (y1-f1(a))^2 ) )
   return(mis1)
 }
 #funkcja licząca niedopasowanie dla drugiej funkcji
@@ -30,35 +28,35 @@ m2<-function(par){
   a<-par[1]
   b<-par[2]
   c<-par[3]
-  mis2<-sum ( sqrt( (y2-f2(dx,b,c))^2 ) )
+  mis2<-sum ( sqrt( (y2-f2(a,b,c))^2 ) )
   return(mis2)
 }
-norma L2
-Chodzi o znalezienie takich a b i c które
-najlepiej pasują do realnych wartości
-funkcji!
+#norma L2
+#Chodzi o znalezienie takich a b i c które
+#najlepiej pasują do realnych wartości
+#funkcji!
   #funkcja celu dla obydwu funkcji z wagami
   misfit<-function(par){
     a<-par[1]
     b<-par[2]
     c<-par[3]
-    mis1<-sum ( sqrt( (y1-f1(dx,a,b,c))^2 ) )
-    mis2<-sum ( sqrt( (y2-f2(dx,b,c))^2 ) )
+    mis1<-sum ( sqrt( (y1-f1(a))^2 ) )
+    mis2<-sum ( sqrt( (y2-f2(a,b,c))^2 ) )
     return(w1*mis1+w2*mis2)
   }
 # zróbmy optymalizację z wagami
 library(optimization)
-#wagi
+#wagi------------------------------------------------------------------------------------------------------------------------------
 w1<-0.5
 w2<-0.5
 #algorytm startuje z punktu:
-a<-0
-b<-0
-c<-0
+x1<-0
+x2<-0
+x3<-0
 #optymalizacja lokalna simplex
-best<-optim_nm(start=c(a,b,c),k=3,fun=misfit)
+best<-optim_nm(start=c(x1,x2,x3),k=3,fun=misfit)
 best$par
-#1.718751 3.074948 3.400393
+#1.722227 3.222319 1.999087
 
 #zróbmy multistart dla różnych losowych wag
 #wektory i macierz na funkcje celu oraz na parametry:
@@ -71,17 +69,17 @@ for (i in 1:1000){
   w1<-runif(1)
   w2<- 1 - w1
   #losowe startowe a b i c
-  a<-runif(1,0,5)
-  b<-runif(1,0,5)
-  c<-runif(1,0,5)
-  best<-optim_nm(start=c(a,b,c),k=3,fun=misfit)
+  x1<-runif(1,-pi,pi)
+  x2<-runif(1,-5,5)
+  x3<-runif(1,-5,5)
+  best<-optim_nm(start=c(x1,x2,x3),k=3,fun=misfit)
   m1_v[i]<-m1(best$par)
   m2_v[i]<-m2(best$par)
   par_m[i,]<-best$par
 }
-plot(m1_v,m2_v,pch=19)
+plot(m1_v,m2_v,pch=19, xlim = c(0, 5))
 
-#PSO
+#PSO-------------------------------------------------------------------------------------------------------------------------------
 #inicjalizacja
 #ilość ptaszków
 n<-512
